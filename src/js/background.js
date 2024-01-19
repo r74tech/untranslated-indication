@@ -212,9 +212,14 @@ async function fetchAndStoreWikidotData() {
 
 
 // Chrome拡張機能が起動したときにデータ更新をチェック
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async (details) => {
     console.log('Chrome拡張機能が起動しました。');
     
+    // オプションページを開く
+    if (details.reason === "install") {
+        chrome.runtime.openOptionsPage();
+    }
+
     // 最初の起動時にデフォルト言語を設定
     chrome.storage.sync.get(['selectedLanguages'], function (data) {
         console.log("data", data);
