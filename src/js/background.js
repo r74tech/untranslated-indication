@@ -214,9 +214,20 @@ async function fetchAndStoreWikidotData() {
 // Chrome拡張機能が起動したときにデータ更新をチェック
 chrome.runtime.onInstalled.addListener(async () => {
     console.log('Chrome拡張機能が起動しました。');
-    // if (await shouldUpdateData()) {
+    
+    // 最初の起動時にデフォルト言語を設定
+    chrome.storage.sync.get(['selectedLanguages'], function (data) {
+        console.log("data", data);
+        if (!data.selectedLanguages) {
+            chrome.storage.sync.set({ selectedLanguages: ['jp'] }, function () {
+                console.log('デフォルト言語設定: jp');
+            });
+        }
+    });
+
+    if (await shouldUpdateData()) {
         fetchAndStoreWikidotData();
-    // }
+    }
 });
 
 // URLが翻訳されているかをチェックする
