@@ -16,14 +16,14 @@
   "background": {
     "service_worker": "./js/background.js"
   },
- "content_scripts": [
-   {
-    "matches": [
-      "*://*.wikidot.com/*"
-    ],
-    "js": ["js/contents.js"]
-   }
- ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.wikidot.com/*"
+      ],
+      "js": ["js/contents.js"]
+    }
+  ],
   "permissions": [
     "tabs",
     "storage"
