@@ -2,12 +2,35 @@
 <html>
 
 <head>
-  <title>Chrome拡張機能の名称</title>
-  <script type="text/javascript" src="js/options.js"></script>
+  <meta charset="UTF-8">
+  <title>オプション</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
 </head>
 
 <body>
-  <script type="text/javascript" src="js/analytics.js"></script>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">言語設定</h1>
+      <div id="message" class="notification is-primary is-hidden"></div>
+      <form id="optionsForm" class="form">
+        <div class="field">
+          <label class="label" for="languageSelect">対象言語を選択:</label>
+          <div class="control">
+            <div class="select is-multiple">
+              <select id="languageSelect" multiple>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <button type="submit" class="button is-primary">保存</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+  <script type="text/javascript" src="js/options.js"></script>
 </body>
 
 </html>
