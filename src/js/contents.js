@@ -140,19 +140,30 @@ var chunkSize = 50; // 各チャンクのサイズ
 
 // SCP関連のドメインかどうかを判断する関数
 function isScpRelatedLink(url) {
-    const domain = new URL(url).hostname;
-    return Object.values(scpBranches).some(branch => {
-        return domain === new URL(branch.url).hostname || branch.customDomains.includes(domain);
-    });
+    try {
+        const domain = new URL(url).hostname;
+        return Object.values(scpBranches).some(branch => {
+            const branchDomain = new URL(branch.url).hostname;
+            return domain === branchDomain || branch.customDomains.includes(domain);
+        });
+    } catch (e) {
+        // console.error("Invalid URL:", url);
+        // return false;
+    }
 }
 
 // URLから言語コードを取得する関数
 function getLanguageCodeFromUrl(url) {
-    const domain = new URL(url).hostname;
-    for (const [code, branch] of Object.entries(scpBranches)) {
-        if (domain === new URL(branch.url).hostname || branch.customDomains.includes(domain)) {
-            return code;
+    try {
+        const domain = new URL(url).hostname;
+        for (const [code, branch] of Object.entries(scpBranches)) {
+            const branchDomain = new URL(branch.url).hostname;
+            if (domain === branchDomain || branch.customDomains.includes(domain)) {
+                return code;
+            }
         }
+    } catch (e) {
+        console.error("Invalid URL:", url);
     }
     return null;
 }
@@ -165,12 +176,12 @@ function processChunk(chunk) {
         chunk.forEach(function (link) {
             if (isScpRelatedLink(link.href)) {
                 const linkLanguageCode = getLanguageCodeFromUrl(link.href);
-                if (!selectedLanguages.includes(linkLanguageCode)) {
+                if (linkLanguageCode && !selectedLanguages.includes(linkLanguageCode)) {
                     var icon = document.createElement('i');
                     icon.classList.add('fa', 'fa-language');
 
                     chrome.runtime.sendMessage({ url: link.href }, function (response) {
-                        if (response.isTranslated) {
+                        if (response && response.isTranslated) {
                             icon.style.color = '#b01';
                         } else {
                             icon.style.color = 'grey';
