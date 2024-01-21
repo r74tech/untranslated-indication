@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_Name__",
   "description": "__MSG_Description__",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "action": {
     "default_icon": "icons/icon128.png",
     "default_popup": "./options.html"
@@ -21,7 +21,9 @@
       "matches": [
         "*://*.wikidot.com/*"
       ],
-      "js": ["js/contents.js"]
+      "js": [
+        "js/contents.js"
+      ]
     }
   ],
   "permissions": [
