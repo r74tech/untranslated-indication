@@ -150,9 +150,10 @@ async function saveLastUpdated() {
     const transaction = db.transaction(["metadata"], "readwrite");
     const store = transaction.objectStore("metadata");
 
-    store.put({ key: "lastUpdated", value: Date.now() });
+    const now = Date.now();
+    store.put({ key: "lastUpdated", value: now });
+    console.log('最終更新日時:', new Date(now).toLocaleString()); // 日付を表示
 }
-
 // 最終更新日時を確認する
 async function shouldUpdateData() {
     const db = await openDatabase();
@@ -164,6 +165,12 @@ async function shouldUpdateData() {
         request.onsuccess = event => {
             const lastUpdated = event.target.result?.value;
             const oneDay = 1000 * 60 * 60 * 24;
+
+            // 最終更新日時をコンソールに出力
+            if (lastUpdated) {
+                console.log('最終更新日時:', new Date(lastUpdated).toLocaleString());
+            }
+
             resolve(!lastUpdated || (Date.now() - lastUpdated > oneDay));
         };
 
@@ -173,10 +180,34 @@ async function shouldUpdateData() {
     });
 }
 
+
+// 最終更新日時を取得する関数
+async function getLastUpdated() {
+    const db = await openDatabase();
+    const transaction = db.transaction(["metadata"], "readonly");
+    const store = transaction.objectStore("metadata");
+    const request = store.get("lastUpdated");
+
+    return new Promise(resolve => {
+        request.onsuccess = event => {
+            const lastUpdated = event.target.result?.value;
+            resolve(lastUpdated);
+        };
+
+        request.onerror = () => {
+            resolve(null);
+        };
+    });
+}
+
+
 // ...
 
 // データをIndexedDBに保存し、その後読み取る
 async function fetchAndStoreWikidotData() {
+    // 現在の最終更新日時を取得しておく
+    const lastUpdateBeforeFetch = (await getLastUpdated()) || 0;
+
     for (const [branchKey, branch] of Object.entries(scpBranches)) {
         console.log(`Fetching data for ${branch.name}...`);
         try {
@@ -206,8 +237,11 @@ async function fetchAndStoreWikidotData() {
         }
     }
 
-    // 最終更新日時を記録
-    await saveLastUpdated();
+    // データ取得後に最終更新日時を確認し、変更があった場合のみ更新
+    const lastUpdateAfterFetch = (await getLastUpdated()) || 0;
+    if (lastUpdateAfterFetch === lastUpdateBeforeFetch) {
+        await saveLastUpdated();
+    }
 }
 
 
